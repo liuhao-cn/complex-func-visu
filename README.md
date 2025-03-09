@@ -1,112 +1,109 @@
-# 复函数可视化演示
+# 复函数可视化项目
 
-这个项目使用 Manim 库创建了一个复函数映射的可视化演示。通过动画方式展示复变函数在不同路径上的映射关系，帮助理解复分析中的函数行为。
+这个项目使用 Manim 库创建复函数的可视化动画，帮助理解复变函数的行为和导数特性。
+
+## 项目概述
+
+复变函数在数学和物理学中有广泛应用，但其几何意义往往难以直观理解。本项目通过动画方式展示：
+
+1. 当自变量 z 沿不同路径移动时，函数值 f(z) 的轨迹变化
+2. 复函数在不同点的导数特性，通过彩色线段可视化展示
 
 ## 功能特点
 
-- **复平面可视化**：在二维平面上展示复数的实部和虚部
-- **多种路径演示**：包括矩形、圆形、径向和阿基米德螺线等多种路径
-- **实时映射**：直观展示输入点 z 和输出点 f(z) 的对应关系
-- **轨迹跟踪**：通过彩色轨迹清晰展示映射前后的路径变化
-- **可配置参数**：可以方便地修改函数表达式和路径参数
+- **路径演示**：展示自变量沿矩形、圆形、径向和螺线等不同路径移动时，函数值的轨迹
+- **导数可视化**：通过彩色线段展示复函数在不同点的导数特性
+- **多函数支持**：内置多个复函数示例，包括可导函数和不可导函数
+- **字幕系统**：自动生成带时间戳的字幕文件，便于后期处理
 
-## 演示内容
+## 已实现的函数
 
-该程序演示了复函数 f(z) = (z³ - z² + z)i 在以下路径上的映射关系：
+1. `f(z) = z^2/2`：简单的二次函数
+2. `f(z) = z^3/4 - z^2/2 + z`：高阶多项式函数
+3. `f(z) = (x+y) + (x^2+y^2)/2*i`：不可导的复函数示例
 
-1. **矩形路径**：在复平面上沿矩形边界移动
-2. **圆形路径**：在复平面上沿圆周移动
-3. **径向路径**：从原点沿不同角度的径向线移动
-4. **阿基米德螺线**：沿螺旋线从原点向外移动
-
-每种路径演示都会显示：
-- 红色点表示输入值 z 及其轨迹
-- 黄色点表示输出值 f(z) 及其轨迹
-- 左上角显示函数表达式
-- 右上角显示当前路径类型
-
-## 安装说明
+## 安装与使用
 
 ### 前提条件
 
-- Python 3.7 或更高版本
-- pip 包管理器
+- Python 3.7+
+- Manim 库
+- NumPy
+- Matplotlib
 
-### 安装步骤
+### 安装依赖
 
-1. 克隆此仓库：
-   ```bash
-   git clone https://github.com/yourusername/complex-function-visualization.git
-   cd complex-function-visualization
-   ```
-
-2. 安装依赖：
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### 可能的系统依赖
-
-Manim 可能需要一些系统依赖，如 FFmpeg、LaTeX 等。请参考 [Manim 安装指南](https://docs.manim.community/en/stable/installation.html) 获取详细信息。
-
-## 使用方法
-
-1. 运行演示：
-   ```bash
-   manim -qh complex_function_visualization.py ComplexFunctionVisualization
-   ```
-
-   参数说明：
-   - `-q`：设置质量（h=高质量，m=中等质量，l=低质量）
-   - `-p`：生成后自动播放
-
-2. 修改函数：
-   
-   编辑 `complex_function_visualization.py` 文件顶部的 `complex_function` 函数和 `latex_formula` 变量来更改演示的函数。
-
-3. 调整参数：
-
-   修改 `z_scale` 变量可以调整所有路径的大小。
-
-## 自定义
-
-### 修改函数
-
-要更改演示的复函数，请编辑文件顶部的以下部分：
-
-```python
-# 定义复函数
-def complex_function(z):
-    return (z**3 - z**2 + z)*complex(0, 1)
-    # return np.sin(z)  # 取消注释以使用正弦函数
-
-# 定义复函数对应的 latex 文本公式
-latex_formula = "f(z) = (z^3 - z^2 + z)\mathbf{i}"
-# latex_formula = "f(z) = \sin(z)"
+```bash
+pip install manim numpy matplotlib
 ```
 
-### 添加新路径
+### 运行演示
 
-要添加新的路径类型，请：
+```bash
+manim -ql complex_function_visualization.py ComplexFunctionVisualization
+```
 
-1. 创建一个新的路径生成方法，类似于 `create_rectangle_path`
-2. 在 `construct` 方法中添加对 `demonstrate_path` 的调用
+参数说明：
+- `-q`：设置视频质量（l=低, m=中, h=高）
+- `-l`：低质量，适合快速预览
 
-## 贡献指南
+## 项目结构
 
-欢迎贡献！如果您想改进这个项目，请：
+- `complex_function_visualization.py`：主程序文件
+- `media/`：生成的媒体文件和字幕存放目录
 
-1. Fork 这个仓库
-2. 创建您的特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交您的更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 开启一个 Pull Request
+## 技术细节
+
+### 路径演示
+
+通过 Manim 的 `TracedPath` 和 `MoveAlongPath` 动画，展示自变量和函数值的轨迹。支持的路径类型：
+
+- 矩形路径
+- 圆形路径
+- 径向路径
+- 阿基米德螺线
+
+### 导数可视化
+
+使用数值微分方法计算复函数在不同方向上的导数，并通过彩色线段可视化。线段的方向和长度反映了导数的方向和大小，颜色则用于区分不同的方向。
+
+对于可导函数，df 线段应形成一个圆环，反映了复函数导数的几何意义。对于不可导函数，df 线段的分布则会显示非圆环或绕圈方向和 dz 不一致等异常行为。
+
+### 字幕系统
+
+自动生成 JSONL 格式的字幕文件，包含字幕编号、文本内容和时间戳，便于后期处理和多语言支持。
+
+## 扩展与自定义
+
+### 添加新函数
+
+在文件开头定义新的复函数和对应的 LaTeX 公式：
+
+```python
+def complex_function4(z):
+    return np.sin(z)
+
+latex_formula4 = "f(z) = \sin(z)"
+```
+
+然后在 `construct` 方法中添加对应的演示代码。
+
+### 自定义路径
+
+可以通过添加新的路径创建方法来扩展路径类型，只需返回路径对象和起始点。
+
+## 注意事项
+
+- 渲染高质量视频可能需要较长时间
+- 复杂函数的数值计算可能在某些点附近不稳定
+
+## 未来计划
+
+- 添加更多经典复函数示例
+- 实现复变函数的等值线和等相线可视化
+- 支持交互式探索复函数特性
+- 添加更多语言的字幕支持
 
 ## 许可证
 
-本项目采用 MIT 许可证 - 详情请参阅 [LICENSE](LICENSE) 文件。
-
-## 致谢
-
-- [Manim 社区](https://www.manim.community/) - 提供了强大的数学动画库
-- 所有复分析的教育工作者和学习者 
+MIT 
