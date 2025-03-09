@@ -437,7 +437,7 @@ class ComplexFunctionVisualization(Scene):
         self.animation_timer += 0.5
         
         self.update_subtitle("现在让我们换一个不可导函数，请大家注意观察它和可导函数的不同", wait=5)
-
+        
         function_formula = MathTex(latex_formula3).to_corner(UL).set_color(WHITE)
         self.play(Write(function_formula), run_time=1.5)
         self.animation_timer += 1.5

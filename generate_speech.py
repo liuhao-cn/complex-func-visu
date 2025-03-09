@@ -144,7 +144,14 @@ def clean_cache():
     print("已清理临时文件")
 
 
-def generate_speech(video_file, subtitles_file, tts_engine, voice_name):
+if __name__ == "__main__":
+    
+    video_file = "media/videos/complex_function_visualization/2160p60/ComplexFunctionVisualization.mp4"
+    subtitles_file = "media/subtitles.jsonl"
+    tts_engine = tts_engine_aliyun
+    voice_name = "longlaotie" 
+    # voice_name = "loongbella"
+
     cache_dir = "media/cache"
     os.makedirs(cache_dir, exist_ok=True)
 
@@ -168,13 +175,3 @@ def generate_speech(video_file, subtitles_file, tts_engine, voice_name):
     
     # 合并视频和音频
     merge_video_audio(video_file)
-
-if __name__ == "__main__":
-    
-    video_file = "media/videos/complex_function_visualization/1080p60/ComplexFunctionVisualization.mp4"
-    subtitles_file = "media/subtitles.jsonl"
-    tts_engine = tts_engine_aliyun
-    voice_name = "longlaotie" 
-    # voice_name = "loongbella"
-
-    generate_speech(video_file, subtitles_file, tts_engine, voice_name)

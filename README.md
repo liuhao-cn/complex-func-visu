@@ -86,7 +86,7 @@ def complex_function4(z):
 latex_formula4 = "f(z) = \sin(z)"
 ```
 
-然后在 `construct` 方法中添加对应的演示代码。
+然后在 `construct` 方法中添加对应的演示代码，参照现有部分照搬或稍加修改均可。
 
 ### 自定义路径
 
