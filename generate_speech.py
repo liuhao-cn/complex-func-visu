@@ -4,9 +4,35 @@
 import os
 import json
 import shutil
-from pydub import AudioSegment
 import subprocess
-from tts_engine import tts_engine_aliyun, tts_engine_bytedance
+
+from pydub import AudioSegment
+
+cache_dir = "media/cache"
+
+def get_audio_duration(mp3_file):
+    audio = AudioSegment.from_mp3(mp3_file)
+    return audio.duration_seconds
+
+def tts_engine_aliyun(text, mp3_file, role="longmiao"):
+    import dashscope
+    from dashscope.audio.tts_v2 import SpeechSynthesizer
+    model = "cosyvoice-v1"
+    voice = role
+    # 从系统环境变量中获取阿里云API密钥
+    dashscope.api_key = os.environ.get("ALIYUNAPI", "")
+
+    synthesizer = SpeechSynthesizer(model=model, voice=voice)
+    audio = synthesizer.call(text)
+
+    with open(mp3_file, 'wb') as f:
+        f.write(audio)
+
+    audio_duration = get_audio_duration(mp3_file)
+    print(f"生成的语音时长: {audio_duration:.2f}秒")
+
+    return audio_duration
+
 
 def read_subtitles(subtitle_file):
     """读取字幕文件"""
@@ -24,7 +50,7 @@ def read_subtitles(subtitle_file):
         print(f"错误: 字幕文件 {subtitle_file} 格式不正确")
         return []
 
-def run_tts_4all(subtitles):
+def run_tts_4all(subtitles, voice_name):
     """生成所有语音并返回文件列表和时长列表，主程序需要用它来调节动画时间"""
 
     N = len(subtitles)
@@ -38,7 +64,7 @@ def run_tts_4all(subtitles):
         print(f"\n处理字幕 {i+1}/{N}: '{sub['text']}'")
 
         # 生成语音并记录时长
-        duration = tts_engine(sub['text'], audio_file, voice_name)
+        duration = tts_engine_aliyun(sub['text'], audio_file, voice_name)
         
         # 记录文件路径和时长
         file_list.append(audio_file)
@@ -50,6 +76,8 @@ def run_tts_4all(subtitles):
 def make_final_audio(subtitles, audio_files, total_duration):
     """根据总时间创建空白音频，并根据字幕指定的时间插入每个字幕的语音（已经生成好的）"""
     
+    full_audio_file = os.path.join(cache_dir, "full_audio.mp3")
+
     # 创建空白音频，时间单位为 ms
     full_audio = AudioSegment.silent(duration=int(total_duration * 1000))
 
@@ -97,6 +125,8 @@ def get_audio_duration(mp3_file):
 def verify_time(video_file):
     """验证视频和音频的同步性"""
     
+    full_audio_file = os.path.join(cache_dir, "full_audio.mp3")
+    
     video_duration = get_video_duration(video_file)
     audio_duration = get_audio_duration(full_audio_file)
     
@@ -114,6 +144,8 @@ def verify_time(video_file):
 
 def merge_video_audio(video_file):
     """合并视频和音频"""
+    full_audio_file = os.path.join(cache_dir, "full_audio.mp3")
+
     # 使用ffmpeg合并视频和音频
     output_file = video_file.replace('.mp4', '_WithAudio.mp4')
     cmd = [
@@ -139,30 +171,24 @@ def merge_video_audio(video_file):
         return False
 
 
-def clean_cache():
+def clean_cache(cache_dir):
     shutil.rmtree(cache_dir, ignore_errors=True)
     print("已清理临时文件")
 
 
-if __name__ == "__main__":
-    
-    video_file = "media/videos/complex_function_visualization/2160p60/ComplexFunctionVisualization.mp4"
-    subtitles_file = "media/subtitles.jsonl"
-    tts_engine = tts_engine_aliyun
-    voice_name = "longlaotie" 
-    # voice_name = "loongbella"
-
+def generate_speech(video_file, subtitles_file, voice_name):
     cache_dir = "media/cache"
     os.makedirs(cache_dir, exist_ok=True)
 
-    # 完整音频文件名
-    full_audio_file = os.path.join(cache_dir, "full_audio.mp3")
+    print(f"开始生成语音，使用音色：{voice_name}")
+    print(f"视频文件：{video_file}")
+    print(f"字幕文件：{subtitles_file}")
 
     # 读取字幕文件，其中包含字幕的编号、开始时间、文本内容
     subtitles = read_subtitles(subtitles_file)
 
     # 对所有字幕生成语音
-    audio_files, duration_list = run_tts_4all(subtitles)
+    audio_files, duration_list = run_tts_4all(subtitles, voice_name)
 
     # 计算视频文件的总长度
     total_time = get_video_duration(video_file)
@@ -175,3 +201,12 @@ if __name__ == "__main__":
     
     # 合并视频和音频
     merge_video_audio(video_file)
+
+if __name__ == "__main__":
+    
+    video_file = "media/videos/template/480p15/Template.mp4"
+    subtitles_file = "media/subtitles.jsonl"
+    voice_name = "longlaotie" 
+    # voice_name = "loongbella"
+
+    generate_speech(video_file, subtitles_file, voice_name)
